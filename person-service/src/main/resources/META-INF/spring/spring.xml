@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+
+    <!-- dataSource连接数据库（api 配置文件绝对路径） -->
+    <util:properties id="dbParams"
+                     location="file:/Users/ryan/workspace/YMC-JarsLink/api/src/main/resources/application.properties"/>
+
+    <bean id="dbcpdatasource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="username" value="#{dbParams.username}">
+        </property>
+        <property name="password" value="#{dbParams.pwd}">
+        </property>
+        <property name="driverClassName" value="#{dbParams.drivername}">
+        </property>
+        <property name="url" value="#{dbParams.url}">
+        </property>
+    </bean>
+
+
+    <bean id="sqlsessionfactory"
+          class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 注入连接信息 -->
+        <property name="dataSource" ref="dbcpdatasource">
+        </property>
+
+        <!-- 注入SQL语句的XML文件 -->
+        <property name="mapperLocations"
+                  value="classpath:mapper/*.xml">
+        </property>
+    </bean>
+
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+
+        <property name="basePackage"
+                  value="com.zhengrongkan.personservice.dao">
+        </property>
+        <!-- sqlSessionFactory可以省略，会自动注入 -->
+        <property name="sqlSessionFactoryBeanName"
+                  value="sqlsessionfactory">
+        </property>
+    </bean>
+
+    <!-- action 配置 -->
+    <bean id="addPerson" class="com.zhengrongkan.personservice.action.AddPerson"/>
+    <bean id="getPerson" class="com.zhengrongkan.personservice.action.GetPerson"/>
+    <!-- service 配置 -->
+    <bean id="personService" class="com.zhengrongkan.personservice.service.impl.PersonServiceImpl"/>
+</beans>
